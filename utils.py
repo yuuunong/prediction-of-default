@@ -14,10 +14,8 @@ def make_submit(test_df, features, model):
 
 
 
-def base_model(train_df, features, target):
+def base_model(X, y):
     # 데이터 분할 (입력 변수와 목표 변수)
-    X = train_df[features]
-    y = train_df[target]
 
     # 데이터 분할 (학습 데이터와 테스트 데이터)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -37,3 +35,14 @@ def base_model(train_df, features, target):
 
     return model
 
+def feature_importance(model, X):
+    # 피처 중요도 계산
+    importances = model.feature_importances_
+    indices = np.argsort(importances)[::-1]  # 중요도에 따라 정렬
+
+    plt.figure(figsize=(10, 6))
+    plt.title("Feature Importance")
+    plt.bar(range(X.shape[1]), importances[indices], align='center')
+    plt.xticks(range(X.shape[1]), X.columns[indices], rotation=90)
+    plt.xlim([-1, X.shape[1]])
+    plt.show()
