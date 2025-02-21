@@ -1,12 +1,12 @@
 import pandas as pd
-from datetime.datetime import today
+from datetime import datetime
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 
 
 def make_submit(test_df, features, model):
-    today = today().strftime('%Y-%m-%d')
+    today = datetime.today().strftime('%Y-%m-%d')
     submit_df = pd.read_csv('./data/sample_submission.csv')
 
     submit_df['채무 불이행 확률'] = model.predict(test_df[features])
