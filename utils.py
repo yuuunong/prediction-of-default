@@ -3,7 +3,9 @@ from datetime import datetime
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
-
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def make_submit(test_df, features, model):
     today = datetime.today().strftime('%Y-%m-%d')
