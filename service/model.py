@@ -14,13 +14,13 @@ def base_model(X, y):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # 불균형 데이터 처리
-    smote = SMOTE(random_state=42)
-    X_train, y_train = smote.fit_resample(X_train, y_train)
+    #smote = SMOTE(random_state=42)
+    #X_train, y_train = smote.fit_resample(X_train, y_train)
 
     # hpo
-    best_params = hpo(X_train, y_train)
+    #best_params = hpo(X_train, y_train)
 
-    model = RandomForestClassifier(random_state=42, **best_params)
+    model = RandomForestClassifier(random_state=42)
     model.fit(X_train, y_train)
 
     # 모델 평가
