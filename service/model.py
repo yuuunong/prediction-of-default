@@ -1,6 +1,7 @@
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
 from scipy.stats import randint
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,9 +14,13 @@ def base_model(X, y):
     # 데이터 분할 (학습 데이터와 테스트 데이터)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # 불균형 데이터 처리
+    # 불균형 데이터 처리 (오버샘플링)
     #smote = SMOTE(random_state=42)
     #X_train, y_train = smote.fit_resample(X_train, y_train)
+    
+    # 언더샘플링
+    # rus = RandomUnderSampler(random_state=42)
+    # X_train, y_train = rus.fit_resample(X_train, y_train)
 
     # hpo
     #best_params = hpo(X_train, y_train)
