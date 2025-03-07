@@ -47,9 +47,7 @@ def preprocessing(train_df, test_df):
     # 수치형 데이터
     columns = ['연간 소득', '개설된 신용계좌 수', '신용 거래 연수', '최대 신용한도',
     '마지막 연체 이후 경과 개월 수', '현재 대출 잔액',
-    '현재 미상환 신용액', '월 상환 부채액', '신용 점수', 
-    '신용 한도 사용률', 
-    '소득 대비 부채 잔액 비율', ]
+    '현재 미상환 신용액', '월 상환 부채액', '신용 점수', ]
 
     '''
     outlier_columns = [
@@ -123,7 +121,7 @@ def preprocessing(train_df, test_df):
     '주택 구매': '부동산',
     '이사 비용': '부동산',
     }
-    train_df['대출 목적'] = train_df['대출 목적'].map(category_map)
+    train_df['대출 목적'] = train_df['대출 목적'].map(category_map)ㅉ
     test_df['대출 목적'] = test_df['대출 목적'].map(category_map)
     train_df = pd.get_dummies(train_df, columns=['대출 목적'])
     test_df = pd.get_dummies(test_df, columns=['대출 목적'])
@@ -131,8 +129,8 @@ def preprocessing(train_df, test_df):
 
 
     train_df_target = train_df['채무 불이행 여부']
-    train_df_features = train_df.drop(['채무 불이행 여부', 'UID', '신용 문제 발생 횟수'], axis=1)
-    test_df = test_df.drop(['UID'], axis=1)
+    train_df_features = train_df.drop(['채무 불이행 여부', 'UID',], axis=1)
+    test_df = test_df.drop(['UID',], axis=1)
 
     # 중요 피쳐 선택
     # selector = SelectFromModel(RandomForestClassifier(n_estimators=100), threshold="mean")
