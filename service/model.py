@@ -9,6 +9,7 @@ import koreanize_matplotlib
 from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, roc_curve, auc
 from service.utils import reset_seeds
 
+
 @reset_seeds
 def base_model(X, y):
     # 데이터 분할 (학습 데이터와 테스트 데이터)
@@ -19,13 +20,13 @@ def base_model(X, y):
     #X_train, y_train = smote.fit_resample(X_train, y_train)
     
     # 언더샘플링
-    # rus = RandomUnderSampler(random_state=42)
-    # X_train, y_train = rus.fit_resample(X_train, y_train)
+    #rus = RandomUnderSampler(random_state=42)
+    #X_train, y_train = rus.fit_resample(X_train, y_train)
 
     # hpo
-    #best_params = hpo(X_train, y_train)
+    best_params = hpo(X_train, y_train)
 
-    model = RandomForestClassifier(random_state=42)
+    model = RandomForestClassifier(random_state=42, **best_params)
     model.fit(X_train, y_train)
 
     # 모델 평가

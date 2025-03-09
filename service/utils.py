@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import koreanize_matplotlib
 import seaborn as sns
 
+
 def make_submit(test_df, model):
     today = datetime.today().strftime('%Y-%m-%d')
     base_filename = f'./data/submission_{today}.csv'
@@ -18,7 +19,7 @@ def make_submit(test_df, model):
         counter += 1
 
     submit_df = pd.read_csv('./data/sample_submission.csv')
-    submit_df['채무 불이행 확률'] = model.predict(test_df)
+    submit_df['채무 불이행 확률'] = model.predict_proba(test_df)[:, 1]
     submit_df.to_csv(filename, index=False)
 
 def reset_seeds(func, seed=42):

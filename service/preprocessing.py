@@ -2,6 +2,11 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler, PowerTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectFromModel
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
+from service.utils import reset_seeds
+from matplotlib import pyplot as plt
+import seaborn as sns
 
 def remove_outliers(df, columns):
     for col in columns:
@@ -13,12 +18,13 @@ def remove_outliers(df, columns):
         df = df[(df[col] >= lower_bound) & (df[col] <= upper_bound)]
     return df
 
+@reset_seeds
 def preprocessing(train_df, test_df):
     # 커스텀 피쳐 추가
-    # train_df['신용 한도 사용률'] = train_df['현재 미상환 신용액'] / train_df['최대 신용한도']
-    # test_df['신용 한도 사용률'] = test_df['현재 미상환 신용액'] / test_df['최대 신용한도'] 
-    # train_df['소득 대비 부채 잔액 비율'] = train_df['현재 대출 잔액'] / train_df['연간 소득']
-    # test_df['소득 대비 부채 잔액 비율'] = test_df['현재 대출 잔액'] / test_df['연간 소득']
+    #train_df['신용 한도 사용률'] = train_df['현재 미상환 신용액'] / train_df['최대 신용한도']
+    #test_df['신용 한도 사용률'] = test_df['현재 미상환 신용액'] / test_df['최대 신용한도'] 
+    #train_df['소득 대비 부채 잔액 비율'] = train_df['현재 대출 잔액'] / train_df['연간 소득']
+    #test_df['소득 대비 부채 잔액 비율'] = test_df['현재 대출 잔액'] / test_df['연간 소득']
 
     #train_df['신용카드 발급 가능자'] = train_df['신용 점수'].apply(lambda x: 1 if x >= 645 else 0)
     #train_df['미소금융 등 대상자'] = train_df['신용 점수'].apply(lambda x: 1 if x <= 749 else 0)
@@ -49,7 +55,7 @@ def preprocessing(train_df, test_df):
     '마지막 연체 이후 경과 개월 수', '현재 대출 잔액',
     '현재 미상환 신용액', '월 상환 부채액', '신용 점수', ]
 
-    '''
+    
     outlier_columns = [
         '연간 소득', '개설된 신용계좌 수', '신용 거래 연수',
         '마지막 연체 이후 경과 개월 수', '현재 대출 잔액', '현재 미상환 신용액',
@@ -70,7 +76,8 @@ def preprocessing(train_df, test_df):
     #train_df.loc[train_df['최대 신용한도_outlier'] == 1, '최대 신용한도'] = median_value
     #test_df['최대 신용한도_outlier'] = test_df['최대 신용한도'].apply(lambda x: 1 if x < lower_bound or x > upper_bound else 0)
     #test_df.loc[test_df['최대 신용한도_outlier'] == 1, '최대 신용한도'] = median_value
-    '''
+    
+
     # 수치형 데이터 transform
     pt = PowerTransformer(method='yeo-johnson')
     train_df[columns] = pt.fit_transform(train_df[columns])
@@ -121,7 +128,7 @@ def preprocessing(train_df, test_df):
     '주택 구매': '부동산',
     '이사 비용': '부동산',
     }
-    train_df['대출 목적'] = train_df['대출 목적'].map(category_map)ㅉ
+    train_df['대출 목적'] = train_df['대출 목적'].map(category_map)
     test_df['대출 목적'] = test_df['대출 목적'].map(category_map)
     train_df = pd.get_dummies(train_df, columns=['대출 목적'])
     test_df = pd.get_dummies(test_df, columns=['대출 목적'])
@@ -132,14 +139,44 @@ def preprocessing(train_df, test_df):
     train_df_features = train_df.drop(['채무 불이행 여부', 'UID',], axis=1)
     test_df = test_df.drop(['UID',], axis=1)
 
-    # 중요 피쳐 선택
-    # selector = SelectFromModel(RandomForestClassifier(n_estimators=100), threshold="mean")
-    #selector.fit(train_df_features, train_df_target)
-    # train_df_features = selector.transform(train_df_features)
-    # test_df = selector.transform(test_df)
 
+    train_df_features, test_df = pca_kmeans(train_df_features, test_df)
+
+    # 중요 피쳐 선택
+    #selector = SelectFromModel(RandomForestClassifier(n_estimators=100), threshold="mean")
+    #selector.fit(train_df_features, train_df_target)
+    #train_df_features = selector.transform(train_df_features)
+    #test_df = selector.transform(test_df)
 
 
     return train_df_features, train_df_target, test_df
 
 
+def pca_kmeans(train_df_features, test_df):
+    # PCA 적용
+    pca = PCA(n_components=2)  # 2차원으로 축소
+    reduced_data = pca.fit_transform(train_df_features)
+
+    # K-Means 클러스터링
+    kmeans = KMeans(n_clusters=5, random_state=42)
+    kmeans.fit(reduced_data)
+    labels = kmeans.labels_
+
+    train_df_features['Cluster'] = labels
+    test_df['Cluster'] = kmeans.predict(pca.transform(test_df))
+
+    plt_cluster(reduced_data, kmeans, labels)
+
+    return train_df_features, test_df
+
+def plt_cluster(reduced_data, kmeans, labels):
+    # 시각화
+    plt.figure(figsize=(8, 6))
+    plt.scatter(reduced_data[:, 0], reduced_data[:, 1], c=labels, cmap='viridis', s=50)
+    plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], c='red', marker='X', s=200, label='Centroids')
+    plt.title('PCA + K-Means Clustering', fontsize=16)
+    plt.xlabel('Principal Component 1')
+    plt.ylabel('Principal Component 2')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
