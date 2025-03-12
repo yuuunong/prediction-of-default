@@ -24,9 +24,10 @@ def base_model(X, y):
     #X_train, y_train = rus.fit_resample(X_train, y_train)
 
     # hpo
-    best_params = hpo(X_train, y_train)
+    # best_params = hpo(X_train, y_train)
+    # model = RandomForestClassifier(random_state=42, **best_params)
 
-    model = RandomForestClassifier(random_state=42, **best_params)
+    model = RandomForestClassifier(random_state=42)
     model.fit(X_train, y_train)
 
     # 모델 평가
@@ -67,8 +68,7 @@ def model_report(model, X_test, y_test):
 def hpo(X_train, y_train):
     
     params = {
-        'n_estimators': randint(10, 300),
-        'max_depth': randint(1, 20),
+        'n_estimators': randint(100, 300),
         'min_samples_split': randint(2, 11),
         'min_samples_leaf': randint(1, 11),
     }
