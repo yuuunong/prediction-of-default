@@ -136,11 +136,11 @@ def preprocessing(train_df, test_df):
 
 
     train_df_target = train_df['채무 불이행 여부']
-    train_df_features = train_df.drop(['채무 불이행 여부', 'UID',], axis=1)
-    test_df = test_df.drop(['UID',], axis=1)
+    train_df_features = train_df.drop(['채무 불이행 여부', 'UID'], axis=1)
+    test_df = test_df.drop(['UID'], axis=1)
 
 
-    train_df_features, test_df = pca_kmeans(train_df_features, test_df)
+    # train_df_features, test_df = pca_kmeans(train_df_features, test_df)
 
     # 중요 피쳐 선택
     #selector = SelectFromModel(RandomForestClassifier(n_estimators=100), threshold="mean")

@@ -1,5 +1,5 @@
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 from scipy.stats import randint
@@ -20,14 +20,16 @@ def base_model(X, y):
     #X_train, y_train = smote.fit_resample(X_train, y_train)
     
     # 언더샘플링
-    #rus = RandomUnderSampler(random_state=42)
-    #X_train, y_train = rus.fit_resample(X_train, y_train)
+    # rus = RandomUnderSampler(random_state=42)
+    # X_train, y_train = rus.fit_resample(X_train, y_train)
 
     # hpo
-    # best_params = hpo(X_train, y_train)
+    #best_params = hpo(X_train, y_train)
     # model = RandomForestClassifier(random_state=42, **best_params)
+    # model = GradientBoostingClassifier(random_state=42, **best_params)
+    # model = RandomForestClassifier(random_state=42)
+    model = GradientBoostingClassifier(random_state=42)
 
-    model = RandomForestClassifier(random_state=42)
     model.fit(X_train, y_train)
 
     # 모델 평가
@@ -66,7 +68,7 @@ def model_report(model, X_test, y_test):
 
 @reset_seeds
 def hpo(X_train, y_train):
-    
+    '''
     params = {
         'n_estimators': randint(100, 300),
         'min_samples_split': randint(2, 11),
@@ -75,6 +77,17 @@ def hpo(X_train, y_train):
 
     rf = RandomForestClassifier(random_state=42)
     random_search_cv = RandomizedSearchCV(rf, param_distributions=params, cv=3, n_jobs=-1, random_state=42, n_iter=100, scoring='roc_auc')
+    random_search_cv.fit(X_train, y_train)
+    '''
+    params = {
+        'n_estimators': randint(100, 300),
+        'learning_rate': np.linspace(0.01, 0.1, 10),
+        'min_samples_split': randint(2, 11),
+        'min_samples_leaf': randint(1, 11),
+    }
+
+    gb = GradientBoostingClassifier(random_state=42)
+    random_search_cv = RandomizedSearchCV(gb, param_distributions=params, cv=3, n_jobs=-1, random_state=42, n_iter=100, scoring='roc_auc')
     random_search_cv.fit(X_train, y_train)
 
     print('최적 하이퍼 파라미터: ', random_search_cv.best_params_)
