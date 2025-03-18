@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import koreanize_matplotlib
 from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, roc_curve, auc
 from service.utils import reset_seeds
-
+from xgboost import XGBClassifier
 
 @reset_seeds
 def base_model(X, y):
@@ -28,8 +28,8 @@ def base_model(X, y):
     # model = RandomForestClassifier(random_state=42, **best_params)
     # model = GradientBoostingClassifier(random_state=42, **best_params)
     # model = RandomForestClassifier(random_state=42)
-    model = GradientBoostingClassifier(random_state=42)
-
+    # model = GradientBoostingClassifier(random_state=42)
+    model = XGBClassifier(random_state=42)
     model.fit(X_train, y_train)
 
     # 모델 평가
